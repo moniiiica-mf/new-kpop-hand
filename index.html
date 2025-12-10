@@ -1614,9 +1614,6 @@
       }
 
       // K-Pop Gestures
-      const width = state.videoDisplayWidth || canvas.width;
-      const height = state.videoDisplayHeight || canvas.height;
-
       const crownGesture = detectCrownGesture(handsArray, width, height);
       if (crownGesture && crownGesture.detected) {
         state.crownGestureActive = true;
