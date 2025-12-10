@@ -297,7 +297,7 @@
     // ========================================
 
     // Toggle to disable pinch visual feedback (pink rings) while keeping gesture detection
-    const ENABLE_PINCH_VISUALS = true; // Set to false to hide pinch rings during tap prototyping
+    const ENABLE_PINCH_VISUALS = false; // Set to false to hide pinch rings during tap prototyping
 
     const CONFIG = {
       mirrorVideo: true,
@@ -1149,6 +1149,158 @@
       return null;
     }
 
+    // ========================================
+    // K-POP GESTURES (TWO-HAND)
+    // ========================================
+
+    // Detect Crown Gesture (Red Velvet "Queendom")
+    // Both hands: index + middle fingers extended upward, fingertips close together
+    function detectCrownGesture(hands, width, height) {
+      if (hands.length !== 2) return null;
+
+      const [h1, h2] = hands;
+
+      // Identify left and right hands
+      let leftHand = h1.handedness === 'Left' ? h1 : h2;
+      let rightHand = h1.handedness === 'Right' ? h1 : h2;
+
+      // If we don't have both left and right, return
+      if (leftHand.handedness === rightHand.handedness) return null;
+
+      const leftLm = leftHand.landmarks;
+      const rightLm = rightHand.landmarks;
+
+      // Get key landmarks
+      const leftIndexTip = leftLm[LANDMARKS.INDEX_TIP];
+      const leftMiddleTip = leftLm[LANDMARKS.MIDDLE_TIP];
+      const leftWrist = leftLm[LANDMARKS.WRIST];
+      const leftIndexMcp = leftLm[LANDMARKS.INDEX_MCP];
+      const leftMiddleMcp = leftLm[LANDMARKS.MIDDLE_MCP];
+
+      const rightIndexTip = rightLm[LANDMARKS.INDEX_TIP];
+      const rightMiddleTip = rightLm[LANDMARKS.MIDDLE_TIP];
+      const rightWrist = rightLm[LANDMARKS.WRIST];
+      const rightIndexMcp = rightLm[LANDMARKS.INDEX_MCP];
+      const rightMiddleMcp = rightLm[LANDMARKS.MIDDLE_MCP];
+
+      // Check 1: Both index and middle fingers extended (tips above MCPs)
+      const leftIndexExtended = leftIndexTip.y < leftIndexMcp.y;
+      const leftMiddleExtended = leftMiddleTip.y < leftMiddleMcp.y;
+      const rightIndexExtended = rightIndexTip.y < rightIndexMcp.y;
+      const rightMiddleExtended = rightMiddleTip.y < rightMiddleMcp.y;
+
+      if (!leftIndexExtended || !leftMiddleExtended || !rightIndexExtended || !rightMiddleExtended) {
+        return null;
+      }
+
+      // Check 2: Both hands high on screen (smaller y = higher)
+      const leftHandHigh = leftWrist.y < 0.6; // Upper 60% of screen
+      const rightHandHigh = rightWrist.y < 0.6;
+
+      if (!leftHandHigh || !rightHandHigh) {
+        return null;
+      }
+
+      // Check 3: Index fingertips close together horizontally (forming crown peak)
+      const indexTipDistanceX = Math.abs(leftIndexTip.x - rightIndexTip.x) * width;
+      const indexTipDistanceY = Math.abs(leftIndexTip.y - rightIndexTip.y) * height;
+
+      // Tips should be close horizontally (< 150px apart) and vertically aligned (< 80px)
+      const tipsClose = indexTipDistanceX < 150 && indexTipDistanceY < 80;
+
+      if (!tipsClose) {
+        return null;
+      }
+
+      // Check 4: Hands angled inward (left hand wrist is to the left, right hand wrist is to the right)
+      const leftHandAngled = leftWrist.x < leftIndexTip.x;
+      const rightHandAngled = rightWrist.x > rightIndexTip.x;
+
+      if (!leftHandAngled || !rightHandAngled) {
+        return null;
+      }
+
+      // Crown gesture detected!
+      return {
+        detected: true,
+        confidence: 0.95,
+        indexDistance: indexTipDistanceX
+      };
+    }
+
+    // Detect TT Gesture (TWICE "TT")
+    // Both hands: index fingers pointing down toward cheeks, thumbs horizontal
+    function detectTTGesture(hands, width, height) {
+      if (hands.length !== 2) return null;
+
+      const [h1, h2] = hands;
+
+      // Identify left and right hands
+      let leftHand = h1.handedness === 'Left' ? h1 : h2;
+      let rightHand = h1.handedness === 'Right' ? h1 : h2;
+
+      // If we don't have both left and right, return
+      if (leftHand.handedness === rightHand.handedness) return null;
+
+      const leftLm = leftHand.landmarks;
+      const rightLm = rightHand.landmarks;
+
+      // Get key landmarks
+      const leftIndexTip = leftLm[LANDMARKS.INDEX_TIP];
+      const leftIndexMcp = leftLm[LANDMARKS.INDEX_MCP];
+      const leftThumbTip = leftLm[LANDMARKS.THUMB_TIP];
+      const leftThumbMcp = leftLm[LANDMARKS.THUMB_MCP];
+      const leftWrist = leftLm[LANDMARKS.WRIST];
+
+      const rightIndexTip = rightLm[LANDMARKS.INDEX_TIP];
+      const rightIndexMcp = rightLm[LANDMARKS.INDEX_MCP];
+      const rightThumbTip = rightLm[LANDMARKS.THUMB_TIP];
+      const rightThumbMcp = rightLm[LANDMARKS.THUMB_MCP];
+      const rightWrist = rightLm[LANDMARKS.WRIST];
+
+      // Check 1: Index fingers pointing downward (tip below MCP)
+      const leftIndexDown = leftIndexTip.y > leftIndexMcp.y;
+      const rightIndexDown = rightIndexTip.y > rightIndexMcp.y;
+
+      if (!leftIndexDown || !rightIndexDown) {
+        return null;
+      }
+
+      // Check 2: Hands at face height (y between 0.2 and 0.5, roughly nose to chin)
+      const leftAtFaceHeight = leftIndexTip.y > 0.2 && leftIndexTip.y < 0.5;
+      const rightAtFaceHeight = rightIndexTip.y > 0.2 && rightIndexTip.y < 0.5;
+
+      if (!leftAtFaceHeight || !rightAtFaceHeight) {
+        return null;
+      }
+
+      // Check 3: Thumbs roughly horizontal (thumb tip y-distance from MCP is small)
+      const leftThumbHorizontal = Math.abs(leftThumbTip.y - leftThumbMcp.y) < 0.08;
+      const rightThumbHorizontal = Math.abs(rightThumbTip.y - rightThumbMcp.y) < 0.08;
+
+      if (!leftThumbHorizontal || !rightThumbHorizontal) {
+        return null;
+      }
+
+      // Check 4: Index fingers pointing inward
+      // Left index tip should be to the right of left wrist
+      // Right index tip should be to the left of right wrist
+      const leftIndexInward = leftIndexTip.x > leftWrist.x;
+      const rightIndexInward = rightIndexTip.x < rightWrist.x;
+
+      if (!leftIndexInward || !rightIndexInward) {
+        return null;
+      }
+
+      // TT gesture detected!
+      return {
+        detected: true,
+        confidence: 0.95,
+        leftY: leftIndexTip.y,
+        rightY: rightIndexTip.y
+      };
+    }
+
     // DISABLED: Zoom functionality removed temporarily
     /*
     // Detect single-hand zoom based on index+middle finger spread transitions
@@ -1461,6 +1613,36 @@
         });
       }
 
+      // K-Pop Gestures
+      const width = state.videoDisplayWidth || canvas.width;
+      const height = state.videoDisplayHeight || canvas.height;
+
+      const crownGesture = detectCrownGesture(handsArray, width, height);
+      if (crownGesture && crownGesture.detected) {
+        state.crownGestureActive = true;
+        HandInput.emit('kpop-gesture', {
+          name: 'Crown',
+          song: 'Red Velvet - Queendom',
+          confidence: crownGesture.confidence,
+          time: Date.now()
+        });
+      } else {
+        state.crownGestureActive = false;
+      }
+
+      const ttGesture = detectTTGesture(handsArray, width, height);
+      if (ttGesture && ttGesture.detected) {
+        state.ttGestureActive = true;
+        HandInput.emit('kpop-gesture', {
+          name: 'TT',
+          song: 'TWICE - TT',
+          confidence: ttGesture.confidence,
+          time: Date.now()
+        });
+      } else {
+        state.ttGestureActive = false;
+      }
+
       // DISABLED: Two-hand zoom
       /*
       const twoHandZoom = detectTwoHandZoom(handsArray);
@@ -1733,6 +1915,28 @@
         html += `</div>`;
       }
 
+      // K-Pop Gestures Section
+      if (state.hands.size >= 2) {
+        html += `<div class="debug-hand" style="border-top: 2px solid rgba(255, 255, 255, 0.3); margin-top: 15px; padding-top: 15px;">`;
+        html += `<div class="debug-label" style="color: #ff4aff;">🎵 K-Pop Gestures</div>`;
+
+        // Crown Gesture
+        const crownColor = state.crownGestureActive ? '#4aff4a' : '#ff4a4a';
+        const crownStatus = state.crownGestureActive ? '✓ DETECTED' : '✗ NOT DETECTED';
+        html += `<div class="debug-row"><span class="debug-key">Crown (Queendom):</span><span class="debug-value" style="color: ${crownColor}; font-weight: bold;">`;
+        html += `${crownStatus}`;
+        html += `</span></div>`;
+
+        // TT Gesture
+        const ttColor = state.ttGestureActive ? '#4aff4a' : '#ff4a4a';
+        const ttStatus = state.ttGestureActive ? '✓ DETECTED' : '✗ NOT DETECTED';
+        html += `<div class="debug-row"><span class="debug-key">TT (TWICE):</span><span class="debug-value" style="color: ${ttColor}; font-weight: bold;">`;
+        html += `${ttStatus}`;
+        html += `</span></div>`;
+
+        html += `</div>`;
+      }
+
       if (state.hands.size === 0) {
         html = '<div style="color: #888; margin-top: 10px;">No hands detected</div>';
       }
@@ -1829,6 +2033,11 @@
         });
         console.log(`[PINCH ${data.state.toUpperCase()}] Distance: ${data.distance.toFixed(1)}px`);
       }
+    });
+
+    // K-Pop Gesture event listener
+    HandInput.on('kpop-gesture', (data) => {
+      console.log(`[K-POP GESTURE] ${data.name} - ${data.song} (Confidence: ${(data.confidence * 100).toFixed(0)}%)`);
     });
 
     // DISABLED: Zoom event handler
