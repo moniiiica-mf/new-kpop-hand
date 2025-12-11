@@ -1162,9 +1162,9 @@
       return Math.sqrt(dx * dx + dy * dy);
     }
 
-    // Helper: Check if finger is extended
+    // Helper: Check if finger is extended (K-Pop gestures version)
     // tip > pip distance and tip further from wrist than pip
-    function isFingerExtended(landmarks, tipIdx, pipIdx, wristIdx = 0) {
+    function isFingerExtendedSimple(landmarks, tipIdx, pipIdx, wristIdx = 0) {
       const tip = landmarks[tipIdx];
       const pip = landmarks[pipIdx];
       const wrist = landmarks[wristIdx];
@@ -1203,10 +1203,10 @@
       const R_middleTip = R[12], R_middlePip = R[10];
 
       // 1) Both index + middle fingers extended (crown spikes)
-      const leftIndexExtended   = isFingerExtended(L, 8, 6);
-      const rightIndexExtended  = isFingerExtended(R, 8, 6);
-      const leftMiddleExtended  = isFingerExtended(L, 12, 10);
-      const rightMiddleExtended = isFingerExtended(R, 12, 10);
+      const leftIndexExtended   = isFingerExtendedSimple(L, 8, 6);
+      const rightIndexExtended  = isFingerExtendedSimple(R, 8, 6);
+      const leftMiddleExtended  = isFingerExtendedSimple(L, 12, 10);
+      const rightMiddleExtended = isFingerExtendedSimple(R, 12, 10);
 
       if (
         !leftIndexExtended || !rightIndexExtended ||
@@ -1265,8 +1265,8 @@
       const R_wrist = R[0];
 
       // 1) Both index fingers extended (downward)
-      const leftIndexExtended  = isFingerExtended(L, 8, 6);
-      const rightIndexExtended = isFingerExtended(R, 8, 6);
+      const leftIndexExtended  = isFingerExtendedSimple(L, 8, 6);
+      const rightIndexExtended = isFingerExtendedSimple(R, 8, 6);
       if (!leftIndexExtended || !rightIndexExtended) return null;
 
       // 2) Index fingers pointing DOWN (tip lower than PIP)
