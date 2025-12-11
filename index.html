@@ -305,8 +305,9 @@
       minConfidence: 0.7,
       smoothFrames: 8,
       lostTimeoutMs: 220,
-      swipeSpeedPxPerSec: 800,  // Lowered from 1400 for easier detection
-      swipeAngleToleranceDeg: 45, // Increased tolerance
+      swipeSpeedPxPerSec: 1600,  // Increased for more deliberate swipes (was 800)
+      swipeAngleToleranceDeg: 25, // Tighter tolerance for more precise direction (was 45)
+      swipeMinCooldownMs: 800,    // Cooldown between swipes (prevents accidental repeats)
       pinchPx: 55,  // Distance threshold for pinch detection
       pinchHoldMs: 220,
       tapDeltaZ: 0.08,  // Lowered for easier tap detection
@@ -933,7 +934,8 @@
       // Find peak speed
       const peak = hand.velocityHistory.reduce((max, v) => v.speed > max.speed ? v : max, { speed: 0 });
 
-      if (peak.speed > CONFIG.swipeSpeedPxPerSec && peak.time > (hand.lastSwipeTime || 0) + 500) {
+      const cooldown = CONFIG.swipeMinCooldownMs || 500;
+      if (peak.speed > CONFIG.swipeSpeedPxPerSec && peak.time > (hand.lastSwipeTime || 0) + cooldown) {
         const angle = angleDeg(peak.vx, peak.vy);
         const tolerance = CONFIG.swipeAngleToleranceDeg;
 
