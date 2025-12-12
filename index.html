@@ -262,6 +262,63 @@
       opacity: 1;
       transform: translate(-50%, -50%) scale(1.4);
     }
+
+    /* K-Pop Animation Container */
+    .kpop-animation-container {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      width: 25vw;
+      height: 25vh;
+      min-width: 200px;
+      min-height: 150px;
+      max-width: 400px;
+      max-height: 300px;
+      z-index: 95;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .kpop-animation-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      animation: pulseGlow 2s ease-in-out infinite;
+    }
+
+    .placeholder-text {
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
+      }
+      50% {
+        box-shadow: 0 0 40px rgba(118, 75, 162, 0.8);
+      }
+    }
   </style>
 </head>
 <body>
@@ -276,6 +333,13 @@
   </div>
 
   <div class="zoom-indicator" style="display: none;">Zoom: <span id="zoomValue">1.00×</span></div>
+
+  <!-- K-Pop Animation Placeholder -->
+  <div id="kpopAnimation" class="kpop-animation-container" style="display: none;">
+    <div class="kpop-animation-placeholder">
+      <div class="placeholder-text">K-Pop Animation</div>
+    </div>
+  </div>
 
   <div id="demoOverlay"></div>
 
@@ -363,7 +427,9 @@
       useFallback: false,
       mousePos: { x: 0.5, y: 0.5 },
       zoomFactor: 1.0,
-      emaCache: new Map() // key -> smoothed value
+      emaCache: new Map(), // key -> smoothed value
+      kpopAnimationPlaying: false, // Track if K-Pop animation is currently showing
+      lastKpopGesture: null // Track last gesture to prevent immediate retriggering
     };
 
     // ========================================
@@ -1308,6 +1374,42 @@
       };
     }
 
+    // ========================================
+    // K-POP ANIMATION FUNCTIONS
+    // ========================================
+
+    function showKpopAnimation(gestureName, songName) {
+      // Don't retrigger if already playing
+      if (state.kpopAnimationPlaying) return;
+
+      // Don't retrigger the same gesture immediately
+      if (state.lastKpopGesture === gestureName) return;
+
+      console.log(`[K-POP] Triggering animation for ${gestureName} - ${songName}`);
+
+      const animationEl = document.getElementById('kpopAnimation');
+      const textEl = animationEl.querySelector('.placeholder-text');
+
+      // Update text to show gesture and song
+      textEl.innerHTML = `<strong>${gestureName}</strong><br><small>${songName}</small>`;
+
+      // Show the animation
+      animationEl.style.display = 'block';
+      state.kpopAnimationPlaying = true;
+      state.lastKpopGesture = gestureName;
+
+      // Auto-hide after 12 seconds
+      setTimeout(() => {
+        animationEl.style.display = 'none';
+        state.kpopAnimationPlaying = false;
+
+        // Reset last gesture after a cooldown period (3 seconds) to allow re-triggering
+        setTimeout(() => {
+          state.lastKpopGesture = null;
+        }, 3000);
+      }, 12000);
+    }
+
     // DISABLED: Zoom functionality removed temporarily
     /*
     // Detect single-hand zoom based on index+middle finger spread transitions
@@ -1632,6 +1734,8 @@
           confidence: crownGesture.confidence,
           time: Date.now()
         });
+        // Trigger K-Pop animation
+        showKpopAnimation('Crown', 'Red Velvet - Queendom');
       } else {
         state.crownGestureActive = false;
       }
@@ -1645,6 +1749,8 @@
           confidence: ttGesture.confidence,
           time: Date.now()
         });
+        // Trigger K-Pop animation
+        showKpopAnimation('TT', 'TWICE - TT');
       } else {
         state.ttGestureActive = false;
       }
