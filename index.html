@@ -1245,6 +1245,19 @@
       );
     }
 
+    // Helper: Check if finger is curled (for Fancy gesture)
+    // tip NOT much further than PIP (almost same distance from wrist)
+    function isFingerCurled(landmarks, tipIdx, pipIdx, wristIdx = 0) {
+      const tip = landmarks[tipIdx];
+      const pip = landmarks[pipIdx];
+      const wrist = landmarks[wristIdx];
+
+      const wristToTip = dist2D(wrist, tip);
+      const wristToPip = dist2D(wrist, pip);
+
+      return wristToTip < wristToPip * 1.1;  // tip not much further than pip
+    }
+
     // Detect Crown Gesture (Red Velvet "Queendom")
     function detectCrownGesture(hands) {
       if (hands.length !== 2) return null;
@@ -1371,6 +1384,60 @@
         detected: true,
         confidence: 0.95,
         avgY: avgIndexY
+      };
+    }
+
+    // Detect Fancy Gesture (TWICE "Fancy")
+    // Single-hand gesture: Index + Pinky extended, Middle + Ring curled, Thumb out sideways
+    function detectFancyGesture(hand) {
+      if (!hand) return null;
+
+      const L = hand.landmarks;
+      const wrist = L[0];
+
+      // === 1. Finger states ===
+      const indexExtended  = isFingerExtendedSimple(L, 8, 6);   // index tip & PIP
+      const pinkyExtended  = isFingerExtendedSimple(L, 20, 18); // pinky
+      const middleCurled   = isFingerCurled(L, 12, 10);         // middle
+      const ringCurled     = isFingerCurled(L, 16, 14);         // ring
+
+      if (!indexExtended || !pinkyExtended) return null;
+      if (!middleCurled || !ringCurled) return null;
+
+      // === 2. Thumb extended and pointing out from palm ===
+      const thumbTip = L[4];
+      const thumbMcp = L[2];
+
+      const wristToThumbTip = dist2D(wrist, thumbTip);
+      const wristToThumbMcp = dist2D(wrist, thumbMcp);
+
+      const thumbExtended = wristToThumbTip > wristToThumbMcp * 1.1;
+
+      // more sideways than up/down → horizontal-ish thumb
+      const thumb_dx = Math.abs(thumbTip.x - thumbMcp.x);
+      const thumb_dy = Math.abs(thumbTip.y - thumbMcp.y);
+      const thumbHorizontal = thumb_dx > thumb_dy * 1.1;
+
+      if (!thumbExtended || !thumbHorizontal) return null;
+
+      // === 3. Hand is around cheek area (mid-upper screen) ===
+      const indexTip = L[8];
+      const pinkyTip = L[20];
+
+      const avgY = (indexTip.y + pinkyTip.y) / 2;
+
+      // mid–upper third of screen
+      if (avgY > 0.8 || avgY < 0.15) return null;
+
+      // keep fingers reasonably close together (no super spread)
+      const indexPinkyDist = dist2D(indexTip, pinkyTip);
+      if (indexPinkyDist < 0.05 || indexPinkyDist > 0.3) return null;
+
+      // Fancy gesture detected!
+      return {
+        detected: true,
+        confidence: 0.95,
+        handedness: hand.handedness
       };
     }
 
@@ -1755,6 +1822,31 @@
         state.ttGestureActive = false;
       }
 
+      // Fancy Gesture - can be either hand
+      let fancyGesture = null;
+      for (const hand of handsArray) {
+        const fancy = detectFancyGesture(hand);
+        if (fancy && fancy.detected) {
+          fancyGesture = fancy;
+          break;
+        }
+      }
+
+      if (fancyGesture) {
+        state.fancyGestureActive = true;
+        HandInput.emit('kpop-gesture', {
+          name: 'Fancy',
+          song: 'TWICE - Fancy',
+          confidence: fancyGesture.confidence,
+          handedness: fancyGesture.handedness,
+          time: Date.now()
+        });
+        // Trigger K-Pop animation
+        showKpopAnimation('Fancy', 'TWICE - Fancy');
+      } else {
+        state.fancyGestureActive = false;
+      }
+
       // DISABLED: Two-hand zoom
       /*
       const twoHandZoom = detectTwoHandZoom(handsArray);
@@ -1922,7 +2014,7 @@
       }
 
       // Draw K-Pop gesture badge (centered at bottom)
-      if (CONFIG.draw.labels && (state.crownGestureActive || state.ttGestureActive)) {
+      if (CONFIG.draw.labels && (state.crownGestureActive || state.ttGestureActive || state.fancyGestureActive)) {
         const badgeX = vw / 2;
         const badgeY = vh - 100;
 
@@ -1931,6 +2023,8 @@
           gestureName = 'Crown';
         } else if (state.ttGestureActive) {
           gestureName = 'TT';
+        } else if (state.fancyGestureActive) {
+          gestureName = 'Fancy';
         }
 
         // Background
@@ -2057,22 +2151,29 @@
       }
 
       // K-Pop Gestures Section
-      if (state.hands.size >= 2) {
+      if (state.hands.size >= 1) {
         html += `<div class="debug-hand" style="border-top: 2px solid rgba(255, 255, 255, 0.3); margin-top: 15px; padding-top: 15px;">`;
         html += `<div class="debug-label" style="color: #ff4aff;">🎵 K-Pop Gestures</div>`;
 
-        // Crown Gesture
+        // Crown Gesture (requires 2 hands)
         const crownColor = state.crownGestureActive ? '#4aff4a' : '#ff4a4a';
         const crownStatus = state.crownGestureActive ? '✓ DETECTED' : '✗ NOT DETECTED';
         html += `<div class="debug-row"><span class="debug-key">Crown (Queendom):</span><span class="debug-value" style="color: ${crownColor}; font-weight: bold;">`;
         html += `${crownStatus}`;
         html += `</span></div>`;
 
-        // TT Gesture
+        // TT Gesture (requires 2 hands)
         const ttColor = state.ttGestureActive ? '#4aff4a' : '#ff4a4a';
         const ttStatus = state.ttGestureActive ? '✓ DETECTED' : '✗ NOT DETECTED';
         html += `<div class="debug-row"><span class="debug-key">TT (TWICE):</span><span class="debug-value" style="color: ${ttColor}; font-weight: bold;">`;
         html += `${ttStatus}`;
+        html += `</span></div>`;
+
+        // Fancy Gesture (single hand)
+        const fancyColor = state.fancyGestureActive ? '#4aff4a' : '#ff4a4a';
+        const fancyStatus = state.fancyGestureActive ? '✓ DETECTED' : '✗ NOT DETECTED';
+        html += `<div class="debug-row"><span class="debug-key">Fancy (TWICE):</span><span class="debug-value" style="color: ${fancyColor}; font-weight: bold;">`;
+        html += `${fancyStatus}`;
         html += `</span></div>`;
 
         html += `</div>`;
