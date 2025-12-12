@@ -262,6 +262,54 @@
       opacity: 1;
       transform: translate(-50%, -50%) scale(1.4);
     }
+
+    /* K-Pop Gesture Label */
+    .kpop-gesture-label {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) scale(0.8);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px 40px;
+      border-radius: 20px;
+      font-size: 36px;
+      font-weight: 900;
+      color: #fff;
+      text-shadow:
+        0 0 20px rgba(255, 255, 255, 0.8),
+        0 4px 10px rgba(0, 0, 0, 0.5);
+      box-shadow:
+        0 10px 40px rgba(102, 126, 234, 0.6),
+        0 0 80px rgba(118, 75, 162, 0.4),
+        inset 0 2px 20px rgba(255, 255, 255, 0.3);
+      z-index: 70;
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.3s ease;
+      border: 3px solid rgba(255, 255, 255, 0.4);
+      letter-spacing: 2px;
+    }
+
+    .kpop-gesture-label.active {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
+
+    .kpop-gesture-label.crown {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      box-shadow:
+        0 10px 40px rgba(240, 147, 251, 0.6),
+        0 0 80px rgba(245, 87, 108, 0.4),
+        inset 0 2px 20px rgba(255, 255, 255, 0.3);
+    }
+
+    .kpop-gesture-label.tt {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      box-shadow:
+        0 10px 40px rgba(79, 172, 254, 0.6),
+        0 0 80px rgba(0, 242, 254, 0.4),
+        inset 0 2px 20px rgba(255, 255, 255, 0.3);
+    }
   </style>
 </head>
 <body>
@@ -280,6 +328,9 @@
   <div id="demoOverlay"></div>
 
   <div id="tapOrb" class="tap-orb"></div>
+
+  <!-- K-Pop Gesture Label -->
+  <div id="kpopGestureLabel" class="kpop-gesture-label"></div>
 
   <div id="loading" class="loading">
     <div class="loading-spinner"></div>
@@ -1645,6 +1696,18 @@
         });
       } else {
         state.ttGestureActive = false;
+      }
+
+      // Update K-Pop Gesture Label
+      const kpopLabel = document.getElementById('kpopGestureLabel');
+      if (state.crownGestureActive) {
+        kpopLabel.textContent = '👑 CROWN - QUEENDOM';
+        kpopLabel.className = 'kpop-gesture-label active crown';
+      } else if (state.ttGestureActive) {
+        kpopLabel.textContent = '😭 TT - TWICE';
+        kpopLabel.className = 'kpop-gesture-label active tt';
+      } else {
+        kpopLabel.className = 'kpop-gesture-label';
       }
 
       // DISABLED: Two-hand zoom
