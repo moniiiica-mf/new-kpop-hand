@@ -11,10 +11,19 @@
       box-sizing: border-box;
     }
 
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
       overflow: hidden;
-      background: url('Big Wallpaper.jpg') center center / cover no-repeat;
+      background: url('Big Wallpaper.jpg') center center no-repeat;
+      background-size: cover;
+      background-attachment: fixed;
       background-color: #000;
       color: #fff;
     }
@@ -32,20 +41,20 @@
 
     #video {
       position: absolute;
-      top: 68px;
-      left: 43px;
-      width: 714px;
-      height: 488px;
+      top: 73px;
+      left: 73px;
+      width: 654px;
+      height: 410px;
       transform: scaleX(-1);
       object-fit: cover;
     }
 
     #canvas {
       position: absolute;
-      top: 68px;
-      left: 43px;
-      width: 714px;
-      height: 488px;
+      top: 73px;
+      left: 73px;
+      width: 654px;
+      height: 410px;
       pointer-events: none;
       z-index: 10;
     }
@@ -281,10 +290,10 @@
 
     .kpop-animation-placeholder {
       position: absolute;
-      top: 63px;
-      left: 53px;
-      width: 344px;
-      height: 370px;
+      top: 55px;
+      left: 55px;
+      width: 340px;
+      height: 386px;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       display: flex;
       align-items: center;
@@ -2477,22 +2486,9 @@
         const videoNativeWidth = video.videoWidth;
         const videoNativeHeight = video.videoHeight;
 
-        // Calculate actual displayed video size (it fills viewport maintaining aspect ratio)
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        const videoAspect = videoNativeWidth / videoNativeHeight;
-        const viewportAspect = viewportWidth / viewportHeight;
-
-        let displayWidth, displayHeight;
-        if (videoAspect > viewportAspect) {
-          // Video is wider - height fills viewport
-          displayHeight = viewportHeight;
-          displayWidth = displayHeight * videoAspect;
-        } else {
-          // Video is taller - width fills viewport
-          displayWidth = viewportWidth;
-          displayHeight = displayWidth / videoAspect;
-        }
+        // Fixed display dimensions for Desktop - 1 white box
+        const displayWidth = 654;
+        const displayHeight = 410;
 
         const dpr = window.devicePixelRatio || 1;
 
@@ -2503,7 +2499,7 @@
         state.videoDisplayHeight = displayHeight;
         state.dpr = dpr;
 
-        // Canvas matches the displayed video size
+        // Canvas matches the fixed video display size
         canvas.width = Math.round(displayWidth * dpr);
         canvas.height = Math.round(displayHeight * dpr);
         canvas.style.width = displayWidth + 'px';
@@ -2547,14 +2543,17 @@
 
         // Set default canvas size
         const dpr = window.devicePixelRatio || 1;
-        canvas.width = Math.round(window.innerWidth * dpr);
-        canvas.height = Math.round(window.innerHeight * dpr);
-        canvas.style.width = window.innerWidth + 'px';
-        canvas.style.height = window.innerHeight + 'px';
+        const displayWidth = 654;
+        const displayHeight = 410;
+
+        canvas.width = Math.round(displayWidth * dpr);
+        canvas.height = Math.round(displayHeight * dpr);
+        canvas.style.width = displayWidth + 'px';
+        canvas.style.height = displayHeight + 'px';
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-        state.videoDisplayWidth = window.innerWidth;
-        state.videoDisplayHeight = window.innerHeight;
+        state.videoDisplayWidth = displayWidth;
+        state.videoDisplayHeight = displayHeight;
         state.dpr = dpr;
 
         return false;
@@ -2611,48 +2610,20 @@
     // RESIZE HANDLING
     // ========================================
     window.addEventListener('resize', () => {
-      if (!state.cameraActive) {
-        const dpr = window.devicePixelRatio || 1;
-        const w = window.innerWidth;
-        const h = window.innerHeight;
+      // Fixed dimensions - no need to resize
+      const displayWidth = 654;
+      const displayHeight = 410;
+      const dpr = window.devicePixelRatio || 1;
 
-        canvas.width = Math.round(w * dpr);
-        canvas.height = Math.round(h * dpr);
-        canvas.style.width = w + 'px';
-        canvas.style.height = h + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      canvas.width = Math.round(displayWidth * dpr);
+      canvas.height = Math.round(displayHeight * dpr);
+      canvas.style.width = displayWidth + 'px';
+      canvas.style.height = displayHeight + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-        state.videoDisplayWidth = w;
-        state.videoDisplayHeight = h;
-        state.dpr = dpr;
-      } else if (state.videoNativeWidth && state.videoNativeHeight) {
-        // Recalculate display size if camera is active
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        const videoAspect = state.videoNativeWidth / state.videoNativeHeight;
-        const viewportAspect = viewportWidth / viewportHeight;
-
-        let displayWidth, displayHeight;
-        if (videoAspect > viewportAspect) {
-          displayHeight = viewportHeight;
-          displayWidth = displayHeight * videoAspect;
-        } else {
-          displayWidth = viewportWidth;
-          displayHeight = displayWidth / videoAspect;
-        }
-
-        const dpr = window.devicePixelRatio || 1;
-
-        state.videoDisplayWidth = displayWidth;
-        state.videoDisplayHeight = displayHeight;
-        state.dpr = dpr;
-
-        canvas.width = Math.round(displayWidth * dpr);
-        canvas.height = Math.round(displayHeight * dpr);
-        canvas.style.width = displayWidth + 'px';
-        canvas.style.height = displayHeight + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      }
+      state.videoDisplayWidth = displayWidth;
+      state.videoDisplayHeight = displayHeight;
+      state.dpr = dpr;
     });
 
     // ========================================
