@@ -21,9 +21,8 @@
 
     #videoContainer {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      bottom: 20px;
+      left: 20px;
       width: 800px;
       height: 600px;
       background: url('Desktop - 1.png') center center / contain no-repeat;
@@ -270,9 +269,8 @@
     /* K-Pop Animation Container (Desktop - 2.png) */
     .kpop-animation-container {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      top: 80px;
+      right: 100px;
       width: 450px;
       height: 550px;
       background: url('Desktop - 2.png') center center / contain no-repeat;
@@ -329,11 +327,11 @@
 
     @keyframes popIn {
       from {
-        transform: translate(-50%, -50%) scale(0.8);
+        transform: scale(0.8);
         opacity: 0;
       }
       to {
-        transform: translate(-50%, -50%) scale(1);
+        transform: scale(1);
         opacity: 1;
       }
     }
