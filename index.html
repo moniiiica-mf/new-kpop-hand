@@ -28,33 +28,111 @@
       color: #fff;
     }
 
-    #videoContainer {
+    /* Desktop Frame Styling */
+    .desktop-frame {
       position: fixed;
+      background: linear-gradient(135deg, #e8b3d9 0%, #d9a3ce 100%);
+      border: 3px solid #c77fb5;
+      border-radius: 8px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    /* Desktop - 1: Camera Feed */
+    .desktop-1 {
       bottom: 20px;
       left: 20px;
-      width: 800px;
-      height: 600px;
-      background: url('Desktop - 1.png') center center / contain no-repeat;
-      background-size: 100% 100%;
+      width: 740px;
+      height: 560px;
       z-index: 50;
+    }
+
+    .desktop-header {
+      background: linear-gradient(135deg, #d498c5 0%, #c088b0 100%);
+      padding: 12px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #b87aa5;
+    }
+
+    .desktop-icons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .heart-icon {
+      color: white;
+      font-size: 20px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: #ff69b4;
+      font-size: 24px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.2s;
+    }
+
+    .close-btn:hover {
+      transform: scale(1.2);
+    }
+
+    .desktop-menu {
+      background: linear-gradient(135deg, #e8b3d9 0%, #dda8d1 100%);
+      padding: 10px 15px;
+      display: flex;
+      gap: 20px;
+      border-bottom: 2px solid #c77fb5;
+    }
+
+    .menu-item {
+      color: #8b5a7d;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .menu-item.active {
+      color: #d946a8;
+      text-decoration: underline;
+    }
+
+    .menu-item:hover {
+      color: #d946a8;
+    }
+
+    .desktop-content {
+      position: relative;
+      width: 100%;
+      height: calc(100% - 96px);
+      background: white;
+      border: 3px solid #b87aa5;
+      margin: 10px;
+      box-sizing: border-box;
+      overflow: hidden;
     }
 
     #video {
       position: absolute;
-      top: 95px;
-      left: 43px;
-      width: 654px;
-      height: 410px;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       transform: scaleX(-1);
       object-fit: cover;
     }
 
     #canvas {
       position: absolute;
-      top: 95px;
-      left: 43px;
-      width: 654px;
-      height: 410px;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       pointer-events: none;
       z-index: 10;
     }
@@ -275,25 +353,76 @@
       transform: translate(-50%, -50%) scale(1.4);
     }
 
-    /* K-Pop Animation Container (Desktop - 2.png) */
-    .kpop-animation-container {
-      position: fixed;
+    /* Desktop - 2: K-Pop Animation Popup */
+    .desktop-2 {
       top: 80px;
       right: 100px;
       width: 450px;
       height: 550px;
-      background: url('Desktop - 2.png') center center / contain no-repeat;
-      background-size: 100% 100%;
       z-index: 100;
       animation: popIn 0.3s ease-out;
     }
 
-    .kpop-animation-placeholder {
-      position: absolute;
-      top: 63px;
-      left: 55px;
-      width: 340px;
-      height: 386px;
+    .desktop-header-2 {
+      background: linear-gradient(135deg, #d498c5 0%, #c088b0 100%);
+      padding: 12px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #b87aa5;
+    }
+
+    .loading-text {
+      color: #d946a8;
+      font-weight: bold;
+      font-size: 16px;
+      letter-spacing: 1px;
+    }
+
+    .window-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .minimize-btn, .maximize-btn {
+      color: #b87aa5;
+      font-size: 18px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .minimize-btn:hover, .maximize-btn:hover {
+      color: #d946a8;
+    }
+
+    .close-btn-2 {
+      background: transparent;
+      border: none;
+      color: #ff69b4;
+      font-size: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.2s;
+    }
+
+    .close-btn-2:hover {
+      transform: scale(1.2);
+    }
+
+    .desktop-content-2 {
+      position: relative;
+      width: calc(100% - 20px);
+      height: 380px;
+      background: white;
+      border: 3px solid #b87aa5;
+      margin: 10px;
+      overflow: hidden;
+    }
+
+    .kpop-video-placeholder {
+      width: 100%;
+      height: 100%;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       display: flex;
       align-items: center;
@@ -309,29 +438,36 @@
       text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     }
 
-    /* YES/NO Buttons */
-    .kpop-button {
-      position: absolute;
-      bottom: 58px;
-      width: 140px;
-      height: 50px;
-      background: transparent;
-      border: none;
+    .desktop-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      padding: 15px;
+    }
+
+    .action-btn {
+      padding: 12px 40px;
+      border: 3px solid #b87aa5;
+      background: white;
+      color: #d946a8;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 6px;
       cursor: pointer;
-      z-index: 10;
-      transition: opacity 0.2s;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
-    .kpop-button:hover {
-      opacity: 0.7;
+    .action-btn:hover {
+      background: linear-gradient(135deg, #d498c5 0%, #c088b0 100%);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(212, 152, 197, 0.4);
     }
 
-    .kpop-button-yes {
-      left: 60px;
-    }
-
-    .kpop-button-no {
-      right: 60px;
+    .action-btn:active {
+      transform: translateY(0);
     }
 
     @keyframes popIn {
@@ -356,9 +492,47 @@
   </style>
 </head>
 <body>
-  <div id="videoContainer">
-    <video id="video" autoplay playsinline></video>
-    <canvas id="canvas"></canvas>
+  <!-- Desktop - 1: Camera Feed Frame -->
+  <div id="desktop1" class="desktop-frame desktop-1">
+    <div class="desktop-header">
+      <div class="desktop-icons">
+        <span class="heart-icon">♥</span>
+        <span class="heart-icon">♥</span>
+        <span class="heart-icon">♥</span>
+      </div>
+      <button class="close-btn">✕</button>
+    </div>
+    <div class="desktop-menu">
+      <span class="menu-item">File</span>
+      <span class="menu-item">Edit</span>
+      <span class="menu-item active">View</span>
+      <span class="menu-item">Search</span>
+    </div>
+    <div class="desktop-content">
+      <video id="video" autoplay playsinline></video>
+      <canvas id="canvas"></canvas>
+    </div>
+  </div>
+
+  <!-- Desktop - 2: K-Pop Animation Popup -->
+  <div id="desktop2" class="desktop-frame desktop-2" style="display: none;">
+    <div class="desktop-header-2">
+      <span class="loading-text">LOADING...</span>
+      <div class="window-controls">
+        <span class="minimize-btn">—</span>
+        <span class="maximize-btn">□</span>
+        <button class="close-btn-2">✕</button>
+      </div>
+    </div>
+    <div class="desktop-content-2">
+      <div id="kpopVideoPlaceholder" class="kpop-video-placeholder">
+        <div class="placeholder-text">K-Pop Animation</div>
+      </div>
+    </div>
+    <div class="desktop-buttons">
+      <button class="action-btn yes-btn" id="kpopButtonYes">YES</button>
+      <button class="action-btn no-btn" id="kpopButtonNo">NO</button>
+    </div>
   </div>
 
   <div id="debugPanel">
@@ -367,15 +541,6 @@
   </div>
 
   <div class="zoom-indicator" style="display: none;">Zoom: <span id="zoomValue">1.00×</span></div>
-
-  <!-- K-Pop Animation Placeholder (Desktop - 2.png) -->
-  <div id="kpopAnimation" class="kpop-animation-container" style="display: none;">
-    <div class="kpop-animation-placeholder">
-      <div class="placeholder-text">K-Pop Animation</div>
-    </div>
-    <button class="kpop-button kpop-button-yes" id="kpopButtonYes"></button>
-    <button class="kpop-button kpop-button-no" id="kpopButtonNo"></button>
-  </div>
 
   <div id="demoOverlay"></div>
 
@@ -1490,7 +1655,7 @@
 
       console.log(`[K-POP] Triggering animation for ${gestureName} - ${songName}`);
 
-      const animationEl = document.getElementById('kpopAnimation');
+      const animationEl = document.getElementById('desktop2');
       const textEl = animationEl.querySelector('.placeholder-text');
 
       // Store current gesture and song for replay functionality
@@ -1509,7 +1674,7 @@
     }
 
     function closeKpopAnimation() {
-      const animationEl = document.getElementById('kpopAnimation');
+      const animationEl = document.getElementById('desktop2');
       animationEl.style.display = 'none';
       state.kpopAnimationPlaying = false;
 
@@ -1522,7 +1687,7 @@
     function replayKpopAnimation() {
       // Replay the current animation
       if (state.currentKpopGesture && state.currentKpopSong) {
-        const textEl = document.getElementById('kpopAnimation').querySelector('.placeholder-text');
+        const textEl = document.getElementById('desktop2').querySelector('.placeholder-text');
         textEl.innerHTML = `<strong>${state.currentKpopGesture}</strong><br><small>${state.currentKpopSong}</small>`;
         console.log(`[K-POP] Replaying ${state.currentKpopGesture} - ${state.currentKpopSong}`);
       }
@@ -2486,9 +2651,10 @@
         const videoNativeWidth = video.videoWidth;
         const videoNativeHeight = video.videoHeight;
 
-        // Fixed display dimensions for Desktop - 1 white box
-        const displayWidth = 654;
-        const displayHeight = 410;
+        // Get actual display dimensions from desktop-content container
+        const desktopContent = document.querySelector('.desktop-content');
+        const displayWidth = desktopContent.clientWidth;
+        const displayHeight = desktopContent.clientHeight;
 
         const dpr = window.devicePixelRatio || 1;
 
@@ -2499,7 +2665,7 @@
         state.videoDisplayHeight = displayHeight;
         state.dpr = dpr;
 
-        // Canvas matches the fixed video display size
+        // Canvas matches the actual display size
         canvas.width = Math.round(displayWidth * dpr);
         canvas.height = Math.round(displayHeight * dpr);
         canvas.style.width = displayWidth + 'px';
@@ -2541,10 +2707,11 @@
 
         state.useFallback = true;
 
-        // Set default canvas size
+        // Set default canvas size from desktop-content
+        const desktopContent = document.querySelector('.desktop-content');
+        const displayWidth = desktopContent.clientWidth;
+        const displayHeight = desktopContent.clientHeight;
         const dpr = window.devicePixelRatio || 1;
-        const displayWidth = 654;
-        const displayHeight = 410;
 
         canvas.width = Math.round(displayWidth * dpr);
         canvas.height = Math.round(displayHeight * dpr);
@@ -2610,9 +2777,10 @@
     // RESIZE HANDLING
     // ========================================
     window.addEventListener('resize', () => {
-      // Fixed dimensions - no need to resize
-      const displayWidth = 654;
-      const displayHeight = 410;
+      // Update canvas to match desktop-content size
+      const desktopContent = document.querySelector('.desktop-content');
+      const displayWidth = desktopContent.clientWidth;
+      const displayHeight = desktopContent.clientHeight;
       const dpr = window.devicePixelRatio || 1;
 
       canvas.width = Math.round(displayWidth * dpr);
