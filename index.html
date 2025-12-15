@@ -420,6 +420,13 @@
       overflow: hidden;
     }
 
+    .kpop-video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: black;
+    }
+
     .kpop-video-placeholder {
       width: 100%;
       height: 100%;
@@ -525,6 +532,7 @@
       </div>
     </div>
     <div class="desktop-content-2">
+      <video id="kpopVideo" class="kpop-video" style="display: none;" playsinline></video>
       <div id="kpopVideoPlaceholder" class="kpop-video-placeholder">
         <div class="placeholder-text">K-Pop Animation</div>
       </div>
@@ -1646,6 +1654,13 @@
     // K-POP ANIMATION FUNCTIONS
     // ========================================
 
+    // Map gestures to video files
+    const GESTURE_VIDEOS = {
+      'Crown': 'Queendom.mp4',
+      'TT': null,  // No video yet
+      'Fancy': null  // No video yet
+    };
+
     function showKpopAnimation(gestureName, songName) {
       // Don't retrigger if already playing
       if (state.kpopAnimationPlaying) return;
@@ -1656,25 +1671,51 @@
       console.log(`[K-POP] Triggering animation for ${gestureName} - ${songName}`);
 
       const animationEl = document.getElementById('desktop2');
-      const textEl = animationEl.querySelector('.placeholder-text');
+      const videoEl = document.getElementById('kpopVideo');
+      const placeholderEl = document.getElementById('kpopVideoPlaceholder');
+      const textEl = placeholderEl.querySelector('.placeholder-text');
 
       // Store current gesture and song for replay functionality
       state.currentKpopGesture = gestureName;
       state.currentKpopSong = songName;
 
-      // Update text to show gesture and song
-      textEl.innerHTML = `<strong>${gestureName}</strong><br><small>${songName}</small>`;
-
-      // Show the animation
+      // Show the desktop
       animationEl.style.display = 'block';
       state.kpopAnimationPlaying = true;
       state.lastKpopGesture = gestureName;
 
-      // Note: No auto-hide - user must click YES or NO
+      // Check if there's a video for this gesture
+      const videoFile = GESTURE_VIDEOS[gestureName];
+
+      if (videoFile) {
+        // Load and play video
+        videoEl.src = videoFile;
+        videoEl.style.display = 'block';
+        placeholderEl.style.display = 'none';
+
+        videoEl.play().catch(err => {
+          console.error('[K-POP] Video play failed:', err);
+          // Fallback to placeholder
+          videoEl.style.display = 'none';
+          placeholderEl.style.display = 'flex';
+          textEl.innerHTML = `<strong>${gestureName}</strong><br><small>${songName}</small>`;
+        });
+      } else {
+        // Show placeholder
+        videoEl.style.display = 'none';
+        placeholderEl.style.display = 'flex';
+        textEl.innerHTML = `<strong>${gestureName}</strong><br><small>${songName}</small>`;
+      }
     }
 
     function closeKpopAnimation() {
       const animationEl = document.getElementById('desktop2');
+      const videoEl = document.getElementById('kpopVideo');
+
+      // Pause and reset video
+      videoEl.pause();
+      videoEl.currentTime = 0;
+
       animationEl.style.display = 'none';
       state.kpopAnimationPlaying = false;
 
@@ -1687,9 +1728,20 @@
     function replayKpopAnimation() {
       // Replay the current animation
       if (state.currentKpopGesture && state.currentKpopSong) {
-        const textEl = document.getElementById('desktop2').querySelector('.placeholder-text');
-        textEl.innerHTML = `<strong>${state.currentKpopGesture}</strong><br><small>${state.currentKpopSong}</small>`;
-        console.log(`[K-POP] Replaying ${state.currentKpopGesture} - ${state.currentKpopSong}`);
+        const videoEl = document.getElementById('kpopVideo');
+        const videoFile = GESTURE_VIDEOS[state.currentKpopGesture];
+
+        if (videoFile && videoEl.src) {
+          // Restart video
+          videoEl.currentTime = 0;
+          videoEl.play();
+          console.log(`[K-POP] Replaying ${state.currentKpopGesture} video`);
+        } else {
+          // Just update placeholder text
+          const textEl = document.getElementById('desktop2').querySelector('.placeholder-text');
+          textEl.innerHTML = `<strong>${state.currentKpopGesture}</strong><br><small>${state.currentKpopSong}</small>`;
+          console.log(`[K-POP] Replaying ${state.currentKpopGesture} placeholder`);
+        }
       }
     }
 
