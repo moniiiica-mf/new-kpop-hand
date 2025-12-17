@@ -497,6 +497,85 @@
         box-shadow: inset 0 0 40px rgba(118, 75, 162, 0.5);
       }
     }
+
+    /* Desktop - 3: Gesture Guide Notebook */
+    .desktop-3 {
+      top: 20px;
+      left: 20px;
+      width: 320px;
+      height: auto;
+      max-height: 500px;
+      z-index: 60;
+    }
+
+    .notebook-header {
+      background: linear-gradient(135deg, #e8b3d9 0%, #d498c5 100%);
+      padding: 10px 15px;
+      border-bottom: 2px solid #b87aa5;
+      text-align: center;
+    }
+
+    .notebook-title {
+      color: #d946a8;
+      font-weight: bold;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      margin: 0;
+    }
+
+    .notebook-content {
+      background: #fff9fc;
+      padding: 15px;
+      max-height: 420px;
+      overflow-y: auto;
+      border: 3px solid #b87aa5;
+      margin: 10px;
+      box-sizing: border-box;
+    }
+
+    .guide-item {
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .guide-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .guide-label {
+      color: #d946a8;
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .guide-image {
+      width: 100%;
+      height: auto;
+      border: 2px solid #d498c5;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .notebook-content::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .notebook-content::-webkit-scrollbar-track {
+      background: #fce4ec;
+      border-radius: 4px;
+    }
+
+    .notebook-content::-webkit-scrollbar-thumb {
+      background: #d498c5;
+      border-radius: 4px;
+    }
+
+    .notebook-content::-webkit-scrollbar-thumb:hover {
+      background: #c088b0;
+    }
   </style>
 </head>
 <body>
@@ -541,6 +620,27 @@
     <div class="desktop-buttons">
       <button class="action-btn yes-btn" id="kpopButtonYes">YES</button>
       <button class="action-btn no-btn" id="kpopButtonNo">NO</button>
+    </div>
+  </div>
+
+  <!-- Desktop - 3: Gesture Guide Notebook -->
+  <div id="desktop3" class="desktop-frame desktop-3">
+    <div class="notebook-header">
+      <h3 class="notebook-title">✨ TRY THESE GESTURES ✨</h3>
+    </div>
+    <div class="notebook-content">
+      <div class="guide-item">
+        <div class="guide-label">👑 Crown (Queendom)</div>
+        <img src="Queendom_Guide.png" alt="Crown Gesture Guide" class="guide-image">
+      </div>
+      <div class="guide-item">
+        <div class="guide-label">🖤 TT</div>
+        <img src="TT_Guide.png" alt="TT Gesture Guide" class="guide-image">
+      </div>
+      <div class="guide-item">
+        <div class="guide-label">💖 Fancy</div>
+        <img src="Fancy_Guide.png" alt="Fancy Gesture Guide" class="guide-image">
+      </div>
     </div>
   </div>
 
